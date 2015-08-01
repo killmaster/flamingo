@@ -170,7 +170,7 @@ func main() {
 				reply = "Não quero"
 			}
 			percent, _ := strconv.ParseFloat(result.Result.Score, 64)
-			score, _ := int(percent * 100)
+			score := int(percent * 100)
 			reply := user1 + " tem " + strconv.Itoa(score) + "% de compatibilidade com " + user2 + "."
 		} else if len(req) > 1 {
 			rows, err := db.Query("select lastfm from users where nick = '" + e.Nick + "'")

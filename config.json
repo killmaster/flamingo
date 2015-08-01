@@ -3,7 +3,7 @@
     "user": "Flamingo",
     "server": "irc.rizon.net:6667",
     "password": "password",
-    "channel":  "#somechan",
+    "channel":  "#somechannel",
     "api_key": "lastfm-api-key",
     "api_secret": "lastfm-secret"
 }

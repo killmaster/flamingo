@@ -1,6 +1,6 @@
 Flamingo is an IRC bot written in Go.
 
 It uses
-* github.com/thoj/go-ircevent to handle the IRC connection,
-* github.com/mattn/go-sqlite3 to work with the sqlite database,
-* github.com/shkh/lastfm-go/lastfm to communicate with the Last.fm API
+* [go-ircevent](github.com/thoj/go-ircevent) to handle the IRC connection,
+* [go-sqlite3](github.com/mattn/go-sqlite3) to work with the sqlite database,
+* [lastfm-go](github.com/shkh/lastfm-go) to communicate with the Last.fm API

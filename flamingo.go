@@ -26,13 +26,10 @@ type Configuration struct {
 }
 
 func main() {
-	file, err := os.Open("conf.json")
-	if err != nil {
-		log.Fatal(err)
-	}
+	file, _ := os.Open("config.json")
 	decoder := json.NewDecoder(file)
 	configuration := Configuration{}
-	err = decoder.Decode(&configuration)
+	err := decoder.Decode(&configuration)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +38,8 @@ func main() {
 	user := configuration.user
 	server := configuration.server
 	channel := configuration.channel
+
+	fmt.Println("Server: " + server)
 
 	api := lastfm.New(configuration.apiKey, configuration.apiSecret)
 	db, err := sql.Open("sqlite3", "./flamingo.db")

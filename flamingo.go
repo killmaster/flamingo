@@ -169,7 +169,8 @@ func main() {
 			if err != nil {
 				reply = "Não quero"
 			}
-			score, _ := strconv.Atoi(strconv.ParseFloat(result.Result.Score, 64) * 100)
+			percent, _ := strconv.ParseFloat(result.Result.Score, 64)
+			score, _ := strconv.Atoi(percent * 100)
 			reply := user1 + " tem " + strconv.Itoa(score) + "% de compatibilidade com " + user2 + "."
 		} else if len(req) > 1 {
 			rows, err := db.Query("select lastfm from users where nick = '" + e.Nick + "'")
@@ -178,7 +179,7 @@ func main() {
 			}
 			rows.Next()
 			rows.Scan(&user1)
-			rows, err := db.Query("select lastfm from users where nick = '" + req[1] + "'")
+			rows, err = db.Query("select lastfm from users where nick = '" + req[1] + "'")
 			if err != nil {
 				log.Fatal(err)
 			}

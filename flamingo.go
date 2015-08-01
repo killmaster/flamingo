@@ -196,5 +196,10 @@ func main() {
 		irccon.Privmsg(channel, reply)
 	})
 
+	irccon.AddCallback("KICK", func(e *irc.Event) {
+		time.Sleep(1000 * time.Millisecond)
+		irccon.Join(channel)
+	})
+
 	irccon.Loop()
 }

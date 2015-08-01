@@ -185,7 +185,7 @@ func main() {
 			}
 			rows.Next()
 			rows.Scan(&user2)
-			result, err = api.Tasteometer.Compare(lastfm.P{"type1": "user",
+			result, err := api.Tasteometer.Compare(lastfm.P{"type1": "user",
 				"type2":  "user",
 				"value1": user1,
 				"value2": user2})
@@ -195,7 +195,6 @@ func main() {
 			percent, _ := strconv.ParseFloat(result.Result.Score, 64)
 			score := int(percent * 100)
 			reply = user1 + " tem " + strconv.Itoa(score) + "% de compatibilidade com " + user2 + "."
-
 		} else {
 			reply = "Deslarga-me!"
 		}

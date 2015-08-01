@@ -147,7 +147,7 @@ func main() {
 		req := strings.Split(e.Message(), " ")
 		var user1 string
 		var user2 string
-		var reply string
+		reply := "Não mandas em mim"
 		if len(req) > 2 {
 			rows, err := db.Query("select lastfm from users where nick = '" + req[1] + "'")
 			if err != nil {
@@ -185,7 +185,7 @@ func main() {
 			}
 			rows.Next()
 			rows.Scan(&user2)
-			result, err := api.Tasteometer.Compare(lastfm.P{"type1": "user",
+			reply, err := api.Tasteometer.Compare(lastfm.P{"type1": "user",
 				"type2":  "user",
 				"value1": user1,
 				"value2": user2})

@@ -169,8 +169,8 @@ func main() {
 			if err != nil {
 				reply = "Não quero"
 			}
-			score, _ := strconv.Atoi(strconv.ParseFloat(result.Result.Score) * 100)
-			reply := user1 + " tem " + score + "% de compatibilidade com " + user2 + "."
+			score, _ := strconv.Atoi(strconv.ParseFloat(result.Result.Score, 64) * 100)
+			reply := user1 + " tem " + strconv.Itoa(score) + "% de compatibilidade com " + user2 + "."
 		} else if len(req) > 1 {
 			rows, err := db.Query("select lastfm from users where nick = '" + e.Nick + "'")
 			if err != nil {

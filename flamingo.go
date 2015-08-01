@@ -32,7 +32,7 @@ func main() {
 	}
 	decoder := json.NewDecoder(file)
 	configuration := Configuration{}
-	err := decoder.Decode(&configuration)
+	err = decoder.Decode(&configuration)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -147,6 +147,7 @@ func main() {
 		req := strings.Split(e.Message(), " ")
 		var user1 string
 		var user2 string
+		var reply string
 		if len(req) > 2 {
 			rows, err := db.Query("select lastfm from users where nick = '" + req[1] + "'")
 			if err != nil {
@@ -154,7 +155,7 @@ func main() {
 			}
 			rows.Next()
 			rows.Scan(&user1)
-			rows, err := db.Query("select lastfm from users where nick = '" + req[2] + "'")
+			rows, err = db.Query("select lastfm from users where nick = '" + req[2] + "'")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -168,9 +169,9 @@ func main() {
 			if err != nil {
 				reply = "Não quero"
 			}
-			score := strconv.Atoi(strconv.ParseFloat(result.Result.Score) * 100)
+			score, _ := strconv.Atoi(strconv.ParseFloat(result.Result.Score) * 100)
 			reply := user1 + " tem " + score + "% de compatibilidade com " + user2 + "."
-		} else if len > 1 {
+		} else if len(req) > 1 {
 			rows, err := db.Query("select lastfm from users where nick = '" + e.Nick + "'")
 			if err != nil {
 				log.Fatal(err)

@@ -31,8 +31,9 @@ func main() {
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("error:", err)
 	}
+	fmt.Println(configuration.nick) // output: [UserA, UserB]
 
 	nick := configuration.nick
 	user := configuration.user

@@ -61,7 +61,7 @@ func main() {
 	irccon.AddCallback("001", func(e *irc.Event) {
 		time.Sleep(5000 * time.Millisecond)
 		fmt.Println("Identifying")
-		irccon.Privmsg("NickServ", "identify "+configuration.password)
+		irccon.Privmsg("NickServ", "identify "+configuration.Password)
 		fmt.Println("Identified")
 		irccon.Join(channel)
 	})

@@ -4,6 +4,6 @@
     "server": "irc.rizon.net:6667",
     "password": "password",
     "channel":  "#somechan",
-    "api_key": "lastfm-api-key",
-    "api_secret": "lastfm-secret"
+    "apiKey": "lastfm-api-key",
+    "apiSecret": "lastfm-secret"
 }

@@ -16,13 +16,13 @@ import (
 )
 
 type Configuration struct {
-	nick      string
-	user      string
-	server    string
-	password  string
-	channel   string
-	apiKey    string
-	apiSecret string
+	Nick      string
+	User      string
+	Server    string
+	Password  string
+	Channel   string
+	ApiKey    string
+	ApiSecret string
 }
 
 func main() {

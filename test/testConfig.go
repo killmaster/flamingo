@@ -7,7 +7,7 @@ import (
 )
 
 type Configuration struct {
-	Users  string
+	Nick   string
 	Groups []string
 }
 
@@ -19,5 +19,6 @@ func main() {
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	fmt.Println(configuration.Users) // output: [UserA, UserB]
+	result := configuration.Nick
+	fmt.Println(result) // output: [UserA, UserB]
 }

@@ -33,16 +33,16 @@ func main() {
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	fmt.Println(configuration.nick) // output: [UserA, UserB]
+	fmt.Println(configuration.Nick) // output: [UserA, UserB]
 
-	nick := configuration.nick
-	user := configuration.user
-	server := configuration.server
-	channel := configuration.channel
+	nick := configuration.Nick
+	user := configuration.User
+	server := configuration.Server
+	channel := configuration.Channel
 
 	fmt.Println("Server: " + server)
 
-	api := lastfm.New(configuration.apiKey, configuration.apiSecret)
+	api := lastfm.New(configuration.ApiKey, configuration.ApiSecret)
 	db, err := sql.Open("sqlite3", "./flamingo.db")
 	if err != nil {
 		log.Fatal(err)

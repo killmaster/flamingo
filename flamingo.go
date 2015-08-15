@@ -82,7 +82,7 @@ func main() {
 	irccon.AddCallback("JOIN", func(e *irc.Event) {
 		var reply string
 		if strings.EqualFold("Rick971", e.Nick) {
-			reply = "Baza daqui ilheu!"
+			reply = "Bom dia Henrique"
 		} else {
 			reply = "Bom dia " + e.Nick
 		}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"RiotGo"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -11,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/killmaster/RiotGo"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/shkh/lastfm-go/lastfm"
 	"github.com/thoj/go-ircevent"
@@ -277,8 +277,6 @@ func lolSet(req []string, e *irc.Event) {
 
 func lolSummoner(req []string, e *irc.Event) {
 	var reply string
-	var reply2 string
-	var reply3 string
 	var id int64
 	if len(req) > 1 {
 		summoners, err := riot.SummonerByName(riot.EUW, req[1])
@@ -288,12 +286,9 @@ func lolSummoner(req []string, e *irc.Event) {
 		id = summoners[req[1]].ID
 		leagues, err := riot.LeagueEntry(riot.EUW, id)
 		if err != nil {
-			reply = "Summoner name: " + summoners[req[1]].Name
-			reply2 = "Level " + strconv.FormatInt(summoners[req[1]].SummonerLevel, 10)
+			reply = summoners[req[1]].Name + " | Level " + strconv.FormatInt(summoners[req[1]].SummonerLevel, 10)
 		} else {
-			reply = "Summoner name: " + summoners[req[1]].Name
-			reply2 = "Level " + strconv.FormatInt(summoners[req[1]].SummonerLevel, 10)
-			reply3 = fmt.Sprintf("%v %v %v - %v Points", leagues[id][0].Name, leagues[id][0].Tier, leagues[id][0].Entries[0].Division, leagues[id][0].Entries[0].LeaguePoints)
+			reply = summoners[req[1]].Name + " | Level " + strconv.FormatInt(summoners[req[1]].SummonerLevel, 10) + " | " + leagues[id][0].Tier + " " + leagues[id][0].Entries[0].Division
 		}
 	} else {
 		rows, err := db.Query("select summoner from league where nick = '" + e.Nick + "'")
@@ -317,16 +312,11 @@ func lolSummoner(req []string, e *irc.Event) {
 			id, _ := strconv.ParseInt(summonerID, 10, 64)
 			leagues, err := riot.LeagueEntry(riot.EUW, id)
 			if err != nil {
-				reply = "Summoner name: " + summoners[summoner].Name
-				reply2 = "Level " + strconv.FormatInt(summoners[summoner].SummonerLevel, 10)
+				reply = summoners[summoner].Name + " | Level " + strconv.FormatInt(summoners[summoner].SummonerLevel, 10)
 			} else {
-				reply = "Summoner name: " + summoners[summoner].Name
-				reply2 = "Level " + strconv.FormatInt(summoners[summoner].SummonerLevel, 10)
-				reply3 = fmt.Sprintf("%v %v %v - %v Points", leagues[id][0].Name, leagues[id][0].Tier, leagues[id][0].Entries[0].Division, leagues[id][0].Entries[0].LeaguePoints)
+				reply = summoners[summoner].Name + " | Level " + strconv.FormatInt(summoners[summoner].SummonerLevel, 10) + " | " + leagues[id][0].Tier + " " + leagues[id][0].Entries[0].Division
 			}
 		}
 	}
 	irccon.Privmsg(channel, reply)
-	irccon.Privmsg(channel, reply2)
-	irccon.Privmsg(channel, reply3)
 }

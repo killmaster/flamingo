@@ -1,6 +1,7 @@
 package main
 
 import (
+	"RiotGo"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -16,22 +17,27 @@ import (
 )
 
 type Configuration struct {
-	Nick      string
-	User      string
-	Server    string
-	Password  string
-	Channel   string
-	ApiKey    string
-	ApiSecret string
+	Nick       string
+	User       string
+	Server     string
+	Password   string
+	Channel    string
+	ApiKey     string
+	ApiSecret  string
+	RiotApiKey string
 }
 
-var nick string
-var user string
-var server string
-var channel string
-var api *lastfm.Api
-var db *sql.DB
-var irccon *irc.Connection = irc.IRC(nick, user)
+var (
+	nick       string
+	user       string
+	server     string
+	channel    string
+	riotUrl    string
+	riotApiKey string
+	api        *lastfm.Api
+	db         *sql.DB
+	irccon     *irc.Connection = irc.IRC(nick, user)
+)
 
 func main() {
 	file, _ := os.Open("config.json")
@@ -46,6 +52,8 @@ func main() {
 	user = configuration.User
 	server = configuration.Server
 	channel = configuration.Channel
+	riotUrl = "https://euw.api.pvp.net/api/lol/euw/"
+	riotApiKey = configuration.RiotApiKey
 
 	fmt.Println("Server: " + server)
 	fmt.Println("Nick: " + nick)
@@ -61,6 +69,22 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS users(nick TEXT PRIMARY KEY NOT NULL, lastfm TEXT NOT NULL)")
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Println("Last.fm table created successfully")
+	}
+
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS league(nick TEXT PRIMARY KEY NOT NULL, summoner TEXT NOT NULL, id TEXT NOT NULL)")
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Println("League of Legends table created successfully")
+	}
+
+	riot.SetAPIKey(riotApiKey)
 
 	irccon = irc.IRC(nick, user)
 	//irccon.Debug = true
@@ -102,6 +126,10 @@ func main() {
 			lfmSet(req, e)
 		} else if req[0] == "-compare" {
 			lfmCompare(req, e)
+		} else if req[0] == "-lolset" {
+			lolSet(req, e)
+		} else if req[0] == "-sum" {
+			lolSummoner(req, e)
 		}
 	})
 
@@ -219,4 +247,86 @@ func lfmCompare(req []string, e *irc.Event) {
 	}
 	irccon.Privmsg(channel, reply)
 
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func lolSet(req []string, e *irc.Event) {
+	var reply string
+	if len(req) < 2 {
+		reply = "E o summoner name ó palhaço?!"
+	} else {
+		summoners, err := riot.SummonerByName(riot.EUW, req[1])
+		if err != nil {
+			reply = "Não quero fdp, deslarga-me crlh"
+		} else {
+			_, err := db.Exec("insert into league(nick,summoner,id) values('" + e.Nick + "','" + req[1] + "','" + strconv.FormatInt(summoners[req[1]].ID, 10) + "')")
+			if err != nil {
+				reply = "Não quero"
+			} else {
+				reply = "Tá guardado"
+			}
+		}
+	}
+	irccon.Privmsg(channel, reply)
+}
+
+func lolSummoner(req []string, e *irc.Event) {
+	var reply string
+	var reply2 string
+	var reply3 string
+	var id int64
+	if len(req) > 1 {
+		summoners, err := riot.SummonerByName(riot.EUW, req[1])
+		if err != nil {
+			reply = "Não quero fdp, deslarga-me crlh"
+		}
+		id = summoners[req[1]].ID
+		leagues, err := riot.LeagueEntry(riot.EUW, id)
+		if err != nil {
+			reply = "Summoner name: " + summoners[req[1]].Name
+			reply2 = "Level " + strconv.FormatInt(summoners[req[1]].SummonerLevel, 10)
+		} else {
+			reply = "Summoner name: " + summoners[req[1]].Name
+			reply2 = "Level " + strconv.FormatInt(summoners[req[1]].SummonerLevel, 10)
+			reply3 = fmt.Sprintf("%v %v %v - %v Points", leagues[id][0].Name, leagues[id][0].Tier, leagues[id][0].Entries[0].Division, leagues[id][0].Entries[0].LeaguePoints)
+		}
+	} else {
+		rows, err := db.Query("select summoner from league where nick = '" + e.Nick + "'")
+		var summoner string
+		rows.Next()
+		rows.Scan(&summoner)
+		rows, err = db.Query("select id from league where nick ='" + e.Nick + "'")
+		var summonerID string
+		rows.Next()
+		rows.Scan(&summonerID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if summoner == "" {
+			reply = "Não sei qual é o teu summoner name fdp"
+		} else {
+			summoners, err := riot.SummonerByName(riot.EUW, summoner)
+			if err != nil {
+				reply = "Não quero fdp, deslarga-me crlh"
+			}
+			id, _ := strconv.ParseInt(summonerID, 10, 64)
+			leagues, err := riot.LeagueEntry(riot.EUW, id)
+			if err != nil {
+				reply = "Summoner name: " + summoners[summoner].Name
+				reply2 = "Level " + strconv.FormatInt(summoners[summoner].SummonerLevel, 10)
+			} else {
+				reply = "Summoner name: " + summoners[summoner].Name
+				reply2 = "Level " + strconv.FormatInt(summoners[summoner].SummonerLevel, 10)
+				reply3 = fmt.Sprintf("%v %v %v - %v Points", leagues[id][0].Name, leagues[id][0].Tier, leagues[id][0].Entries[0].Division, leagues[id][0].Entries[0].LeaguePoints)
+			}
+		}
+	}
+	irccon.Privmsg(channel, reply)
+	irccon.Privmsg(channel, reply2)
+	irccon.Privmsg(channel, reply3)
 }
